@@ -13,9 +13,8 @@
   <body>
     <div
       x-data="{
-        images: [
-
-        ],
+        images: [],
+        totalImages: 0,
         currentImageIndex: 0,
         get currentImage(){
             return this.currentImageIndex + 1
@@ -27,8 +26,43 @@
                 this.images.push(this.newImageUrl);
                 this.newImageUrl = '';
             }
-        }
+        },
+        fetchData: function(){
+            fetch('public/db/db.json')
+            .then(response => response.json())
+            .then(data => {
+                if(data.images && Array.isArray(data.images)){
+                    this.images = data.images;
+                    this.totalImages = this.images.length
+                }
+            })
+            .catch(error => {
+                console.error('Error Fetching data')
+            })
+        },
+        addImage: function() {
+            if (this.newImageUrl) {
+                fetch('http://127.0.0.1:3000/addImage', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ imageUrl: this.newImageUrl }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update your client-side data, if needed
+                    this.images = data.images;
+                    this.newImageUrl = '';
+                })
+                .catch(error => {
+                    console.error('Error adding image:', error);
+                });
+            }
+        },
     }"
+      x-init="fetchData"
     >
       <div class="gallery-container">
         <h1>Image Gallery</h1>
@@ -41,12 +75,8 @@
             height="300px"
           />
 
-          <div
-            x-data="{
-            imageLength: images.length,
-        }"
-          >
-            <p x-text="currentImage + ' of ' + imageLength"></p>
+          <div>
+            <p x-text="currentImage + ' of ' + totalImages"></p>
           </div>
         </div>
 
