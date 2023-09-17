@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alpine.js Testing</title>
+    <link rel="stylesheet" href="style.css" />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+  </head>
+  <body>
+    <div
+      x-data="{
+        images: [
+
+        ],
+        currentImageIndex: 0,
+        get currentImage(){
+            return this.currentImageIndex + 1
+        },
+        newImageUrl: '',
+        addImage: function() {
+            console.log(this.newImageUrl)
+            if(this.newImageUrl){
+                this.images.push(this.newImageUrl);
+                this.newImageUrl = '';
+            }
+        }
+    }"
+    >
+      <div class="gallery-container">
+        <h1>Image Gallery</h1>
+
+        <div class="image-wrapper">
+          <img
+            :src="images[currentImageIndex]"
+            alt="Gallery Image"
+            width="300px"
+            height="300px"
+          />
+
+          <div
+            x-data="{
+            imageLength: images.length,
+        }"
+          >
+            <p x-text="currentImage + ' of ' + imageLength"></p>
+          </div>
+        </div>
+
+        <div>
+          <button
+            @click="currentImageIndex = (currentImageIndex - 1 + images.length) % images.length"
+          >
+            Previous
+          </button>
+          <button
+            @click="currentImageIndex = (currentImageIndex + 1) % images.length"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <input type="text" placeholder="Enter Image URL" x-model="newImageUrl" />
+      <button x-on:click="addImage">Add Image</button>
+    </div>
+  </body>
+</html>
